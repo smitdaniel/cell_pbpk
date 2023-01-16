@@ -1,22 +1,9 @@
-from abc import ABC, abstractmethod
 from typing import Dict, Tuple, Union
 
 from src.compartment import SpecieType
 
 
-class Pathway(ABC):
-
-    @abstractmethod
-    def update_inputs(self, occupancies) -> 'Pathway':
-        pass
-
-    @property
-    @abstractmethod
-    def output(self):
-        pass
-
-
-class SimplePathway(Pathway):
+class SimplePathway:
     inputs: Dict[SpecieType, bool]
     threshold: Dict[SpecieType, float]
 
@@ -31,10 +18,7 @@ class SimplePathway(Pathway):
                     lbl: Union[SpecieType, Tuple[SpecieType, SpecieType]]
                     ) -> bool:
         if isinstance(lbl, SpecieType):
-            if lbl == SpecieType.O:
-                return self.output
-            else:
-                return self.inputs[lbl]
+            return self.inputs[lbl]
         elif isinstance(lbl, tuple):
             if lbl == (SpecieType.A, SpecieType.B):
                 return self.node_ab
@@ -47,7 +31,7 @@ class SimplePathway(Pathway):
 
     @property
     def node_bc(self) -> bool:
-        return self[SpecieType.B] and not self[SpecieType.C]
+        return self[SpecieType.B] or not self[SpecieType.C]
 
     def update_inputs(self,
                       occ_ratios: Dict[SpecieType, float]
